@@ -4,7 +4,8 @@ import styled from 'styled-components'
 
 function App() {
   const [reviewIndex, setReviewIndex] = React.useState(0);
-  const [reviews, setReviews] = React.useState([
+  const [flag, setFlag] = React.useState(true);
+  const reviews = [
     {
       title: "review sample1"
     },
@@ -23,93 +24,15 @@ function App() {
     {
       title: "review sample6"
     }
-  ]);
-
-
-  React.useEffect(() => {
-    // if (typeof window !== "undefined") {
-    //   const reviewStyle = `
-    //     border: 2px solid blue;
-    //     padding: 50px;
-    //     margin: 15px;
-    //     transition: transform 0.4s ease-out;
-    //   `;
-
-    //   let parent = document.getElementById("review-carousel");
-    //   let child = document.createElement("div");
-    //   child.setAttribute("style", reviewStyle);
-    //   child.className = "each-review";
-    //   child.innerHTML = reviews[(5 + reviewIndex) % 6].title;
-    //   parent.append(child);
-    // }
-  }, [reviewIndex, reviews]);
+  ];
 
   const setStyle = (nav) => {
     let classes = document.getElementsByClassName("each-review");
     for (let i = 0; i < classes.length - 1; i++) {
-      console.log(classes[i].style.transform);
-      if (nav === "next") {
-        if (reviewIndex >= 0 ? Math.abs(reviewIndex) === 0 : Math.abs(reviewIndex) >= 3) {
-          classes[i].style.transform = `translateX(-${250}px)`;
-        } else if (reviewIndex >= 0 ? Math.abs(reviewIndex) === 1 : Math.abs(reviewIndex) === 2) {
-          if (i === 4) {
-            classes[i].style.transform = `translateX(-${250}px)`;
-          } else {
-            classes[i].style.transform = `translateX(-${2 * 250}px)`;
-          }
-        } else if (reviewIndex >= 0 ? Math.abs(reviewIndex) === 2 : Math.abs(reviewIndex) === 1) {
-          if (i === 4) {
-            classes[i].style.transform = `translateX(-${250}px)`;
-          } else if (i === 3) {
-            classes[i].style.transform = `translateX(-${2 * 250}px)`;
-          } else {
-            classes[i].style.transform = `translateX(-${3 * 250}px)`;
-          }
-        } else if (reviewIndex >= 0 ? Math.abs(reviewIndex) >= 3 : Math.abs(reviewIndex) === 0) {
-          if (i === 4) {
-            classes[i].style.transform = `translateX(-${250}px)`;
-          } else if (i === 3) {
-            classes[i].style.transform = `translateX(-${2 * 250}px)`;
-          } else if (i === 2) {
-            classes[i].style.transform = `translateX(-${3 * 250}px)`;
-          } else if (i === 1) {
-            classes[i].style.transform = `translateX(-${4 * 250}px)`;
-          }
-        }
-      } else if (nav === "prev") {
-        if (Math.abs(reviewIndex) === 0) {
-          classes[i].style.transform = `translateX(${250}px)`;
-        } else if (Math.abs(reviewIndex) === 1) {
-          if (i === 0) {
-            classes[i].style.transform = `translateX(${250}px)`;
-          } else {
-            classes[i].style.transform = `translateX(${2 * 250}px)`;
-          }
-        } else if (Math.abs(reviewIndex) === 2) {
-          if (i === 0) {
-            classes[i].style.transform = `translateX(${250}px)`;
-          } else if (i === 1) {
-            classes[i].style.transform = `translateX(${2 * 250}px)`;
-          } else {
-            classes[i].style.transform = `translateX(${3 * 250}px)`;
-          }
-        } else if (Math.abs(reviewIndex) >= 3) {
-          if (reviewIndex <= 0) {
-            if (i === 0) {
-              classes[i].style.transform = `translateX(${250}px)`;
-            } else if (i === 1) {
-              classes[i].style.transform = `translateX(${2 * 250}px)`;
-            } else if (i === 2) {
-              classes[i].style.transform = `translateX(${3 * 250}px)`;
-            } else if (i === 3) {
-              classes[i].style.transform = `translateX(${4 * 250}px)`;
-            }
-          } else {
-            let translated = Number(classes[i].style.transform.split("(")[1].split("p")[0]);
-            classes[i].style.transform = `translateX(${translated + 250}px)`;
-          }
-        }
-      }
+      let x = window.getComputedStyle(classes[i]).getPropertyValue("transform").split(",")[4] || 0;
+
+      let newX = nav === "next" ? Number(x) - 250 : Number(x) + 250;
+      classes[i].style.transform = `translateX(${newX}px)`;
     }
   }
 
@@ -160,6 +83,10 @@ function App() {
       setStyle("next");
       review[0].remove();
     }
+
+    setTimeout(() => {
+      setFlag(true);
+    }, 500)
   }
 
   return (
@@ -172,8 +99,18 @@ function App() {
       }
       <MaskingBorder>
         <ButtonGroup>
-          <button id="prev" onClick={handleReviewMove}>left</button>
-          <button id="next" onClick={handleReviewMove}>right</button>
+          <button id="prev" onClick={(e) => {
+            if (flag) {
+              setFlag(false);
+              handleReviewMove(e);
+            }
+          }}>left</button>
+          <button id="next" onClick={(e) => {
+            if (flag) {
+              setFlag(false);
+              handleReviewMove(e);
+            }
+          }}>right</button>
         </ButtonGroup>
       </MaskingBorder>
       <Container id="review-carousel">
