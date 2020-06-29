@@ -1,7 +1,6 @@
 import React from 'react';
 import styled from 'styled-components'
 
-
 function App() {
   const [reviewIndex, setReviewIndex] = React.useState(0);
   const [flag, setFlag] = React.useState(true);
@@ -42,43 +41,28 @@ function App() {
     let review = document.getElementsByClassName("each-review");
     child.className = "each-review";
 
+    const reviewStyle = `
+      border: 2px solid blue;
+      padding: 50px;
+      transition: transform 0.4s ease-out;
+      display: inline-block;
+      position: absolute;
+      left: ${e.target.id === "prev" ? 20 : 80}%;
+    `;
+
     if (e.target.id === "prev") {
       setReviewIndex(prev => prev - 1);
-      const reviewStyle = `
-        border: 2px solid blue;
-        padding: 50px;
-        margin: 15px;
-        transition: transform 0.4s ease-out;
-        display: inline-block;
-        position: absolute;
-        left: 20%;
-      `;
       child.setAttribute("style", reviewStyle);
-      if (reviewIndex <= 0) {
-        child.innerHTML = reviews[5 - (Math.abs(reviewIndex) % 6)].title;
-      } else {
-        child.innerHTML = reviews[Math.abs((5 + reviewIndex)) % 6].title;
-      }
+      let index = reviewIndex <= 0 ? 5 - (Math.abs(reviewIndex) % 6) : Math.abs(5 + reviewIndex) % 6;
+      child.innerHTML = reviews[index].title;
       setStyle("prev");
       parent.insertBefore(child, review[0]);
       review[5].remove();
     } else if (e.target.id === "next") {
       setReviewIndex(prev => prev + 1);
-      const reviewStyle = `
-          border: 2px solid blue;
-          padding: 50px;
-          margin: 15px;
-          transition: transform 0.4s ease-out;
-          display: inline-block;
-          position: absolute;
-          left: 80%;
-        `;
       child.setAttribute("style", reviewStyle);
-      if (reviewIndex < 0) {
-        child.innerHTML = reviews[5 - (Math.abs(reviewIndex) % 6)].title;
-      } else {
-        child.innerHTML = reviews[Math.abs((5 + reviewIndex)) % 6].title;
-      }
+      let index = reviewIndex < 0 ? 5 - (Math.abs(reviewIndex) % 6) : Math.abs(5 + reviewIndex) % 6;
+      child.innerHTML = reviews[index].title;
       parent.append(child);
       setStyle("next");
       review[0].remove();
@@ -90,29 +74,7 @@ function App() {
   }
 
   return (
-    <Masking>
-      {reviewIndex}
-      {
-        reviewIndex < 0 ?
-          "index = " + (Math.abs(reviewIndex + 6) % 6) :
-          "index = " + (Math.abs(reviewIndex) % 6)
-      }
-      <MaskingBorder>
-        <ButtonGroup>
-          <button id="prev" onClick={(e) => {
-            if (flag) {
-              setFlag(false);
-              handleReviewMove(e);
-            }
-          }}>left</button>
-          <button id="next" onClick={(e) => {
-            if (flag) {
-              setFlag(false);
-              handleReviewMove(e);
-            }
-          }}>right</button>
-        </ButtonGroup>
-      </MaskingBorder>
+    <div>
       <Container id="review-carousel">
         <Review id="r0" className="each-review" style={{ transition: `transform 0.4s ease-out` }}>{reviews[0].title}</Review>
         <Review id="r1" className="each-review" style={{ transition: `transform 0.4s ease-out` }}>{reviews[1].title}</Review>
@@ -120,7 +82,21 @@ function App() {
         <Review id="r3" className="each-review" style={{ transition: `transform 0.4s ease-out` }}>{reviews[3].title}</Review>
         <Review id="r4" className="each-review" style={{ transition: `transform 0.4s ease-out` }}>{reviews[4].title}</Review>
       </Container>
-    </Masking >
+      <ButtonGroup>
+        <button id="prev" onClick={(e) => {
+          if (flag) {
+            setFlag(false);
+            handleReviewMove(e);
+          }
+        }}>left</button>
+        <button id="next" onClick={(e) => {
+          if (flag) {
+            setFlag(false);
+            handleReviewMove(e);
+          }
+        }}>right</button>
+      </ButtonGroup>
+    </div >
   );
 }
 
@@ -142,25 +118,16 @@ const Container = styled.div`
   }
 `;
 
-const Masking = styled.div`
-`;
-
-const MaskingBorder = styled.div`
-  border: 1px solid red;
-  width: 500px;
-  height: 200px;
-  margin: 0 auto;
-`;
-
 const ButtonGroup = styled.div`
   display: flex;
-  justify-content: space-between;
+  justify-content: space-evenly;
+  position: relative;
+  top: 200px;
 `;
 
 const Review = styled.div`
   border: 2px solid blue;
   padding: 50px;
-  margin: 15px;
   display: inline-block;
   position: absolute;
 `;
